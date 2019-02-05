@@ -1,8 +1,8 @@
-# AutoHotKey
+# AutoHotKey Script
+
+This is a collection of my AHK scripts, with `Daily.ahk` being the main script that I run daily. Some files specified in the `#include` commands in `Daily.ahk` are not uploaded (i.e. `AutoCorrect.ahk`) because they contain private information.
 
 ## Windows Configuration
-
----
 
 ### Auto Startup (no admin privilege)
 
@@ -24,8 +24,6 @@
 
 ## Issues
 
----
-
 - **file path**: some programs need to specify full path to run
 
 - **conflicting titles**:
@@ -42,8 +40,6 @@
 
 ## Todo
 
----
-
 - <kbd>Capslock</kbd>+<kbd>Space</kbd>: cycle group (<kbd>Win</kbd>+<kbd>1~9</kbd>)
 
 - use <kbd>Shift</kbd> as secondary function
@@ -54,9 +50,7 @@
 
 ## Notes
 
----
-
-Some command parameters do not allow expression syntax, so we need to use legacy syntax (i.e. `%Var%` or `% Var`)
+Some command parameters do not allow expression syntax, so legacy syntax is needed (i.e. `%Var%` or `% Var`)
 
 All function parameters allow expression syntax, meaning variables do not need to be wrapped with percent sign
 
@@ -66,5 +60,5 @@ All function parameters allow expression syntax, meaning variables do not need t
 
 - `{{}` = `{`
 - `{}}` = `}`
-- `{Return}`,`{Enter}`,``n` = new line
-- `{Tab}`,``t` = tab
+- `{Return}`,`{Enter}`,`` `n`` = new line
+- `{Tab}`,`` `t`` = tab

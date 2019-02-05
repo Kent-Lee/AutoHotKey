@@ -1,12 +1,5 @@
 ﻿; Last Revision: 2019-02-02
 
-/*
-	todo:	- capslock + space :: cycle group (win + 1-9)
-			- use shift for secondary function
-			- capslock + wasd :: move window to position (top left, bottom left, right side)
-			- capslock + t :: terminal opened in specific directory (cmd?)
-*/
-
 ; AUTO EXECUTE ====================================================================================
  
 ; details for script optimization: 
@@ -126,7 +119,7 @@ SearchWebsite(website)
 	return
 } 
 
-; find selected tab in current active program
+; find tab by user input in current active program
 FindTab()
 {
 	WinGet, program, ProcessName, A
