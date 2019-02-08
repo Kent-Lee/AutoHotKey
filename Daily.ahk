@@ -257,6 +257,12 @@ CapsLock & Numpad2::Send, {Volume_Down 5}
 	return
 
 ; mouse control
+Mbutton::
+	MouseGetPos, x, y
+	MouseMove, A_ScreenWidth, y, 0
+	Send, +{LButton}
+	MouseMove, x, y, 0
+	return
 #If MouseHover("ahk_class Shell_TrayWnd")
 	WheelUp::Send, {Volume_Up}
 	WheelDown::Send, {Volume_Down}
@@ -280,7 +286,6 @@ F4::GroupActivate, explorerGroup, R
 	CapsLock & u::Send, ^{PgUp}
 	CapsLock & o:: Send, ^{PgDn}
 	CapsLock & Enter:: Send, {End}{Enter}
-	; CapsLock & t::Send, ^t
 	CapsLock & r::Send, ^+t
 #IfWinActive ahk_exe mintty.exe
 	^v::Send, {Raw}%Clipboard%
