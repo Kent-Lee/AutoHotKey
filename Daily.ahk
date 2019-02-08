@@ -257,11 +257,12 @@ CapsLock & Numpad2::Send, {Volume_Down 5}
 	return
 
 ; mouse control
-Mbutton::
-	MouseGetPos, x, y
-	MouseMove, A_ScreenWidth, y, 0
+CapsLock & Mbutton::
+	MouseGetPos, mouse_x, mouse_y
+	WinGetPos, win_x, win_y, win_w, win_h, A
+	MouseMove, win_w-15, mouse_y, 0
 	Send, +{LButton}
-	MouseMove, x, y, 0
+	MouseMove, mouse_x, mouse_y, 0
 	return
 #If MouseHover("ahk_class Shell_TrayWnd")
 	WheelUp::Send, {Volume_Up}
