@@ -1,6 +1,8 @@
 # AutoHotKey Script
 
-This is a collection of my AHK scripts, with `Daily.ahk` being the main script that I run daily. Some files specified in the `#include` commands in `Daily.ahk` are not uploaded (i.e. `AutoCorrect.ahk`) because they contain private information.
+This is my AHK script designed for daily use. Some functions are written by me, while others are modified or copied from online. For the latter, I have commented links to the original authors.
+
+Note that files specified in the `#include` commands in `Daily.ahk` are not uploaded (i.e. `AutoCorrect.ahk`) because they contain private information.
 
 ## Windows Configuration
 

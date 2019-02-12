@@ -1,4 +1,4 @@
-﻿; Last Revision: 2019-02-02
+﻿; Last Revision: 2019-02-12
 
 ; AUTO EXECUTE ====================================================================================
  
@@ -155,6 +155,7 @@ FindTab()
 	return
 }
 
+; https://goo.gl/DtZL8P
 ; check if mouse is hovering an existing window
 MouseHover(window_class)
 {
@@ -163,10 +164,10 @@ MouseHover(window_class)
 }
 
 ; check if mouse is over an active window
-MouseOver(window_class, y_target)
+MouseOver(window_class, y_boundary)
 {
 	MouseGetPos, x, y, A
-	return WinActive(window_class . " ahk_id " . A) AND (y < y_target)
+	return WinActive(window_class . " ahk_id " . A) AND (y < y_boundary)
 }
 
 ; move active window to specified position and size
@@ -197,10 +198,7 @@ FocusWindow(transparency)
 	transparency := Floor(transparency * 255)
 	WinSet, AlwaysOnTop, toggle, A
 	WinGet, current_transparency, Transparent, A
-	if (current_transparency == transparency)
-    	WinSet, Transparent, Off, A
-	else
-   		WinSet, Transparent, % transparency, A
+	WinSet, Transparent, % (current_transparency == transparency) ? "Off" : transparency, A
 	return
 }
 
@@ -218,7 +216,7 @@ return
 ; program shortcut
 CapsLock & a::ActivateProgram("ahk_exe AcroRd32.exe", "AcroRd32.exe")
 CapsLock & e::ActivateProgram("ahk_class CabinetWClass", "explorer.exe")
-CapsLock & c::ActivateProgram("ahk_exe Code.exe" ,"C:\Users\kentl\AppData\Local\Programs\Microsoft VS Code\Code.exe")
+CapsLock & c::ActivateProgram("ahk_exe Code.exe" ,"C:\Program Files\Microsoft VS Code\Code.exe")
 CapsLock & g::ActivateProgram("ahk_exe chrome.exe", "chrome.exe")
 CapsLock & t::ActivateProgram("ahk_exe mintty.exe", "C:\Program Files\Git\git-bash.exe")
 CapsLock & o::ActivateProgram("ahk_exe Battle.net.exe", "C:\Program Files (x86)\Battle.net\Battle.net.exe")
@@ -242,21 +240,21 @@ CapsLock & v::
 	return
 
 ; media control
-CapsLock & Numpad5::Send, {Media_Play_Pause}
-CapsLock & Numpad4::Send, {Media_Prev}
-CapsLock & Numpad6::Send, {Media_Next}
-CapsLock & Numpad8::Send, {Volume_Up 5}
-CapsLock & Numpad2::Send, {Volume_Down 5}
+CapsLock & Down::Send, {Media_Play_Pause}
+CapsLock & Left::Send, {Media_Prev}
+CapsLock & Right::Send, {Media_Next}
 
 ; system control
 #Del::FileRecycleEmpty
-#c::Run, control
+#c::Run, Control
+; lock system and turn off screen
 #l::
 	DllCall("LockWorkStation")
 	SendMessage 0x112, 0xF170, 2, , Program Manager
 	return
 
 ; mouse control
+; scroll to mouse position instantly
 CapsLock & Mbutton::
 	MouseGetPos, mouse_x, mouse_y
 	WinGetPos, win_x, win_y, win_w, win_h, A
@@ -264,6 +262,21 @@ CapsLock & Mbutton::
 	Send, +{LButton}
 	MouseMove, mouse_x, mouse_y, 0
 	return
+; https://goo.gl/vRsUaN
+; move mouse pixel by pixel for dragging/drawing graphics
+CapsLock & Numpad0::Send, % (toggle := !toggle) ? "{LButton Down}" : "{LButton Up}"
+#If toggle
+	LButton::return
+#If
+CapsLock & Numpad1::MouseMove, -1, 1, 0, R
+CapsLock & Numpad2::MouseMove, 0, 1, 0, R
+CapsLock & Numpad3::MouseMove, 1, 1, 0, R
+CapsLock & Numpad4::MouseMove, -1, 0, 0, R
+CapsLock & Numpad5::return
+CapsLock & Numpad6::MouseMove, 1, 0, 0, R
+CapsLock & Numpad7::MouseMove, -1, -1, 0, R
+CapsLock & Numpad8::MouseMove, 0, -1, 0, R
+CapsLock & Numpad9::MouseMove, 1, -1, 0, R
 #If MouseHover("ahk_class Shell_TrayWnd")
 	WheelUp::Send, {Volume_Up}
 	WheelDown::Send, {Volume_Down}
