@@ -80,23 +80,22 @@ ActivateProgram(program, program_path)
 UriEncode(str)
 {
 	; set new_str's capacity == buffer size of str + "\0"(null terminator)
-    VarSetCapacity(new_str, StrPut(str, "UTF-8"), 0)
+	VarSetCapacity(new_str, StrPut(str, "UTF-8"), 0)
 	; write str to new_str with UTF-8 encoding
 	StrPut(str, &new_str, "UTF-8")
 	; set code == binary number of each character in new_str
-    while (code := NumGet(new_str, A_Index-1, "UChar"))
+	while (code := NumGet(new_str, A_Index-1, "UChar"))
 		; concatenate chr, if Chr(code) matches regex, use chr, else use hex of code
 		; e.g. code == 15, %X == F (in hex), %02X == 0F (expect >2 characters, prepend with zeros if less)
 		; need to prepend zeros to single hex character to decode correctly later
-    	res .= (chr := Chr(code)) ~= "[0-9A-Za-z]" ? chr : Format("%{:02X}", code)
-    return res
+		res .= (chr := Chr(code)) ~= "[0-9A-Za-z]" ? chr : Format("%{:02X}", code)
+	return res
 }
 
 ; decode uri str to original format
 UriDecode(str)
 {
-    loop
-	{
+	loop {
 		if (RegExMatch(str, "i)(?<=%)[0-9a-f]{1,2}", hex))
 			StringReplace, str, str, `%%hex%, % Chr("0x" . hex), All
 		else break
@@ -111,45 +110,41 @@ SearchWebsite(website)
 	Send, ^c
 	ClipWait, 0
 	if (InStr(Clipboard, "http"))
-		Run, % Clipboard
-	else if (website = "YouTube")
-		Run, % "https://www.youtube.com/results?search_query=" . UriEncode(Clipboard)
-	else if (website = "Google")
-		Run, % "http://www.google.com/search?q=" . UriEncode(Clipboard)
+		action := % Clipboard
+	else if (website == "youtube")
+		action := "https://www.youtube.com/results?search_query=" . UriEncode(Clipboard)
+	else if (website == "google")
+		action := "http://www.google.com/search?q=" . UriEncode(Clipboard)
+	Run, % action
 	return
-} 
+}
 
-; find tab by user input in current active program
-FindTab()
+; search tab by user input in current active program
+SearchTab()
 {
 	WinGet, program, ProcessName, A
+	if (program == "chrome.exe" || program == "Code.exe") {
+		switch_tab := "^{PgDn}"
+		action := "http://www.google.com/search?q=" . UriEncode(user_input)
+	}
+	else if (program == "Explorer.EXE") {
+		switch_tab := "{F4}"
+		action := "find G:\"
+	}
+	else return
+
 	Input, user_input, B T5 E, {Enter}
 	WinGetTitle, current_tab, A
 	original_tab := current_tab
-	if (program = "chrome.exe") {
-		loop {
-			if (InStr(current_tab, user_input))
-				return
-			Send, ^{PgDn}
-			Sleep, 30
-			WinGetTitle, current_tab, A
-			if (current_tab == original_tab) {
-				Run, % "http://www.google.com/search?q=" . UriEncode(user_input)
-				return
-			}
-		}
-	}
-	else if (program = "Explorer.EXE") {
-		loop {
-			if (InStr(current_tab, user_input))
-				return
-			GroupActivate, explorerGroup, R
-			Sleep, 30
-			WinGetTitle, current_tab, A
-			if (current_tab == original_tab) {
-				Run, find G:\
-				return
-			}
+	loop {
+		if (InStr(current_tab, user_input))
+			return
+		Send, % switch_tab
+		Sleep, 30
+		WinGetTitle, current_tab, A
+		if (current_tab = original_tab) {
+			Run, % action
+			return
 		}
 	}
 	return
@@ -167,16 +162,16 @@ MouseHover(window_class)
 MouseOver(window_class, y_boundary)
 {
 	MouseGetPos, x, y, A
-	return WinActive(window_class . " ahk_id " . A) AND (y < y_boundary)
+	return WinActive(window_class . " ahk_id " . A) && (y < y_boundary)
 }
 
 ; move active window to specified position and size
-MoveWindow(position := "default")
+MoveWindow(position := "default", scale := 1.4)
 {
 	WinRestore, A
 	if (position = "default") {
-		width := A_ScreenWidth / 1.3
-		height := A_ScreenHeight / 1.3
+		width := A_ScreenWidth / scale
+		height := A_ScreenHeight / scale
 		WinMove, A, , (A_ScreenWidth/2)-(width/2), (A_ScreenHeight/2)-(height/2), width, height
 	}
 	else if (position = "left")
@@ -187,8 +182,6 @@ MoveWindow(position := "default")
 		WinMove, A, , A_ScreenWidth/2, 0, A_ScreenWidth/2, A_ScreenHeight
 	else if (position = "bottom")
 		WinMove, A, , 0, A_ScreenHeight/2, A_ScreenWidth, A_ScreenHeight/2
-	else if (position = "overlap")
-		WinMove, A, , 0, 30, A_ScreenWidth, A_ScreenHeight-30
 	return
 }
 
@@ -211,7 +204,7 @@ CapsLock & F10::Run, C:\Program Files\AutoHotkey\WindowSpy.ahk
 CapsLock & Pause::
 	Suspend
 	Pause, , 1
-return
+	return
 
 ; program shortcut
 CapsLock & a::ActivateProgram("ahk_exe AcroRd32.exe", "AcroRd32.exe")
@@ -221,28 +214,34 @@ CapsLock & g::ActivateProgram("ahk_exe chrome.exe", "chrome.exe")
 CapsLock & t::ActivateProgram("ahk_exe mintty.exe", "C:\Program Files\Git\git-bash.exe")
 CapsLock & o::ActivateProgram("ahk_exe Battle.net.exe", "C:\Program Files (x86)\Battle.net\Battle.net.exe")
 CapsLock & l::ActivateProgram("ahk_class RCLIENT", "D:\Games\League of Legends\LeagueClient.exe")
-CapsLock & f::FindTab()
+CapsLock & s::SearchTab()
 
 ; windows navigation
 CapsLock & Space::Send, !{Tab}
 CapsLock & m::MoveWindow()
-CapsLock & z::FocusWindow(0.75)
-CapsLock & p::MoveWindow("overlap")
+CapsLock & Left::MoveWindow("left")
+CapsLock & Up::MoveWindow("top")
+CapsLock & Right::MoveWindow("right")
+CapsLock & Down::MoveWindow("bottom")
+CapsLock & f::FocusWindow(0.75)
 
 ; editing macros
 +Left::Send, +{Home}
 +Right::Send, +{End}
 +BackSpace::Send, +{Home}{Del}
 +Del::Send, +{End}{Del}
+; remove formatting
 CapsLock & v::
 	Clipboard := Clipboard
 	Send, ^v
 	return
 
 ; media control
-CapsLock & Down::Send, {Media_Play_Pause}
-CapsLock & Left::Send, {Media_Prev}
-CapsLock & Right::Send, {Media_Next}
+CapsLock & Numpad5::Send, {Media_Play_Pause}
+CapsLock & Numpad4::Send, {Media_Prev}
+CapsLock & Numpad6::Send, {Media_Next}
+CapsLock & Numpad8::Send, {Volume_Up}
+CapsLock & Numpad2::Send, {Volume_Down}
 
 ; system control
 #Del::FileRecycleEmpty
@@ -264,19 +263,19 @@ CapsLock & Mbutton::
 	return
 ; https://goo.gl/vRsUaN
 ; move mouse pixel by pixel for dragging/drawing graphics
+; toggle mouse click
 CapsLock & Numpad0::Send, % (toggle := !toggle) ? "{LButton Down}" : "{LButton Up}"
 #If toggle
 	LButton::return
-#If
-CapsLock & Numpad1::MouseMove, -1, 1, 0, R
-CapsLock & Numpad2::MouseMove, 0, 1, 0, R
-CapsLock & Numpad3::MouseMove, 1, 1, 0, R
-CapsLock & Numpad4::MouseMove, -1, 0, 0, R
-CapsLock & Numpad5::return
-CapsLock & Numpad6::MouseMove, 1, 0, 0, R
-CapsLock & Numpad7::MouseMove, -1, -1, 0, R
-CapsLock & Numpad8::MouseMove, 0, -1, 0, R
-CapsLock & Numpad9::MouseMove, 1, -1, 0, R
+	CapsLock & Numpad1::MouseMove, -1, 1, 0, R
+	CapsLock & Numpad2::MouseMove, 0, 1, 0, R
+	CapsLock & Numpad3::MouseMove, 1, 1, 0, R
+	CapsLock & Numpad4::MouseMove, -1, 0, 0, R
+	CapsLock & Numpad5::return
+	CapsLock & Numpad6::MouseMove, 1, 0, 0, R
+	CapsLock & Numpad7::MouseMove, -1, -1, 0, R
+	CapsLock & Numpad8::MouseMove, 0, -1, 0, R
+	CapsLock & Numpad9::MouseMove, 1, -1, 0, R
 #If MouseHover("ahk_class Shell_TrayWnd")
 	WheelUp::Send, {Volume_Up}
 	WheelDown::Send, {Volume_Down}
@@ -287,8 +286,8 @@ CapsLock & Numpad9::MouseMove, 1, -1, 0, R
 return
 
 ; special function
-F2::SearchWebsite("Google")
-F3::SearchWebsite("YouTube")
+F2::SearchWebsite("google")
+F3::SearchWebsite("youtube")
 F4::GroupActivate, explorerGroup, R
 
 ; macros in programs
@@ -306,8 +305,10 @@ F4::GroupActivate, explorerGroup, R
 #IfWinActive ahk_exe chrome.exe
 	CapsLock & r::Send, ^+t
 	$^f::
-		Send, ^c^f
-		Sleep, 30
+		Clipboard := ""
+		Send, ^c
+		ClipWait, 0
+		Send, ^f
 		Send, % Clipboard
 		return
 #IfWinActive ahk_class OpusApp
