@@ -64,10 +64,10 @@ return
 ; FUNCTIONS =======================================================================================
 
 ; activate program, if not exist open it, if active minimize it
-ActivateProgram(program, program_path)
+ActivateProgram(program, program_path, directory_path := "")
 {
 	if (!WinExist(program))
-		Run, % program_path
+		Run, % program_path, % directory_path
 	else if (!WinActive(program))
 		WinActivate
 	else
@@ -166,22 +166,30 @@ MouseOver(window_class, y_boundary)
 }
 
 ; move active window to specified position and size
-MoveWindow(position := "default", scale := 1.4)
+MoveWindow(position := "middle", scale := 1.4)
 {
 	WinRestore, A
-	if (position = "default") {
-		width := A_ScreenWidth / scale
-		height := A_ScreenHeight / scale
-		WinMove, A, , (A_ScreenWidth/2)-(width/2), (A_ScreenHeight/2)-(height/2), width, height
+	x := 0
+	y := 0
+	width := A_ScreenWidth
+	height := A_ScreenHeight
+	
+	if (position == "middle") {
+		width /= scale
+		height /= scale
+		x := A_ScreenWidth / 2 - width / 2
+		y := A_ScreenHeight / 2 - height / 2
 	}
-	else if (position = "left")
-		WinMove, A, , 0, 0, A_ScreenWidth/2, A_ScreenHeight
-	else if (position = "top")
-		WinMove, A, , 0, 0, A_ScreenWidth, A_ScreenHeight/2
-	else if (position = "right")
-		WinMove, A, , A_ScreenWidth/2, 0, A_ScreenWidth/2, A_ScreenHeight
-	else if (position = "bottom")
-		WinMove, A, , 0, A_ScreenHeight/2, A_ScreenWidth, A_ScreenHeight/2
+	if (InStr(position, "left"))
+		width /= 2
+	if (InStr(position, "top"))
+		height /= 2
+	if (InStr(position, "right"))
+		x := width /= 2
+	if (InStr(position, "bottom"))
+		y := height /= 2
+	
+	WinMove, A, , x, y, width, height
 	return
 }
 
@@ -211,18 +219,22 @@ CapsLock & a::ActivateProgram("ahk_exe AcroRd32.exe", "AcroRd32.exe")
 CapsLock & e::ActivateProgram("ahk_class CabinetWClass", "explorer.exe")
 CapsLock & c::ActivateProgram("ahk_exe Code.exe" ,"C:\Program Files\Microsoft VS Code\Code.exe")
 CapsLock & g::ActivateProgram("ahk_exe chrome.exe", "chrome.exe")
-CapsLock & t::ActivateProgram("ahk_exe mintty.exe", "C:\Program Files\Git\git-bash.exe")
+CapsLock & t::ActivateProgram("ahk_exe mintty.exe", "C:\Program Files\Git\git-bash.exe", "C:\Users\kent")
 CapsLock & o::ActivateProgram("ahk_exe Battle.net.exe", "C:\Program Files (x86)\Battle.net\Battle.net.exe")
 CapsLock & l::ActivateProgram("ahk_class RCLIENT", "D:\Games\League of Legends\LeagueClient.exe")
 CapsLock & s::SearchTab()
 
 ; windows navigation
 CapsLock & Space::Send, !{Tab}
-CapsLock & m::MoveWindow()
-CapsLock & Left::MoveWindow("left")
-CapsLock & Up::MoveWindow("top")
-CapsLock & Right::MoveWindow("right")
-CapsLock & Down::MoveWindow("bottom")
+CapsLock & Numpad1::MoveWindow("bottom left")
+CapsLock & Numpad2::MoveWindow("bottom")
+CapsLock & Numpad3::MoveWindow("bottom right")
+CapsLock & Numpad4::MoveWindow("left")
+CapsLock & Numpad5::MoveWindow()
+CapsLock & Numpad6::MoveWindow("right")
+CapsLock & Numpad7::MoveWindow("top left")
+CapsLock & Numpad8::MoveWindow("top")
+CapsLock & Numpad9::MoveWindow("top right")
 CapsLock & f::FocusWindow(0.75)
 
 ; editing macros
@@ -237,11 +249,9 @@ CapsLock & v::
 	return
 
 ; media control
-CapsLock & Numpad5::Send, {Media_Play_Pause}
-CapsLock & Numpad4::Send, {Media_Prev}
-CapsLock & Numpad6::Send, {Media_Next}
-CapsLock & Numpad8::Send, {Volume_Up}
-CapsLock & Numpad2::Send, {Volume_Down}
+CapsLock & Down::Send, {Media_Play_Pause}
+CapsLock & Left::Send, {Media_Prev}
+CapsLock & Right::Send, {Media_Next}
 
 ; system control
 #Del::FileRecycleEmpty
