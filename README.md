@@ -1,6 +1,6 @@
 # AutoHotKey Script
 
-This is my AHK script designed for daily use. Some functions are written by me, while others are modified or copied from online. For the latter, I have commented links to the original authors.
+This is the AHK script I use daily. Some functions are written by me, while others are modified or copied from online. For the latter, I have included links to the original authors. See comments for function descriptions and usages.
 
 Note that files specified in the `#include` commands in `Daily.ahk` are not uploaded (i.e. `AutoCorrect.ahk`) because they contain private information.
 
@@ -16,7 +16,7 @@ Note that files specified in the `#include` commands in `Daily.ahk` are not uplo
 
 1. use built-in task scheduler (avoids UAC prompt): <kbd>Win</kbd> &rightarrow; `task scheduler`
 
-2. `Create Task`
+2. click `Create Task`, then go to
 
     - `General` &rightarrow; enter task name &rightarrow; check `run with highest privileges`
 
@@ -45,10 +45,6 @@ Note that files specified in the `#include` commands in `Daily.ahk` are not uplo
 - <kbd>Capslock</kbd>+<kbd>Space</kbd>: cycle group (<kbd>Win</kbd>+<kbd>1~9</kbd>)
 
 - use <kbd>Shift</kbd> as secondary function
-
-- <kbd>Capslock</kbd>+<kbd>wasd</kbd>: move window to position (top left, bottom left, right side)
-
-- <kbd>Capslock</kbd>+<kbd>t</kbd>: terminal opened in specific directory
 
 ## Notes
 

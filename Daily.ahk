@@ -1,4 +1,4 @@
-﻿; Last Revision: 2019-02-12
+﻿; Last Revision: 2019-02-23
 
 ; AUTO EXECUTE ====================================================================================
  
@@ -6,8 +6,8 @@
 	; https://autohotkey.com/docs/misc/Performance.htm
 	; https://www.autohotkey.com/boards/viewtopic.php?t=6413
 
-; ensure a consistent starting directory
-SetWorkingDir %A_ScriptDir%  
+; set current folder as starting directory
+SetWorkingDir %A_ScriptDir%
 
 ; prevent empty variables from being looked up as environment variables
 #NoEnv
@@ -25,7 +25,7 @@ Process, Priority, , High
 #KeyHistory 0
 ListLines Off
 
-; set SendMode to SendInput, which has no delay between keystrokes
+; set SendMode to SendInput to have no delay between keystrokes
 SendMode Input
 
 ; if SendInput unavailable, SendEvent is used; set delays at -1 to improve SendEvent's speed
@@ -51,7 +51,7 @@ SetScrollLockState, AlwaysOff
 ; set title matching to search for "containing" instead of "exact"
 SetTitleMatchMode, 2
 
-; add only Explorer windows to group
+; add Explorer windows to group
 GroupAdd, explorerGroup, ahk_class CabinetWClass
 
 ; custom scripts
@@ -64,6 +64,7 @@ return
 ; FUNCTIONS =======================================================================================
 
 ; activate program, if not exist open it, if active minimize it
+; directory_path is the starting directory of the program
 ActivateProgram(program, program_path, directory_path := "")
 {
 	if (!WinExist(program))
@@ -103,7 +104,7 @@ UriDecode(str)
 	return str
 }
 
-; search website by selected words
+; search specified website by selected text, if it contains "http", open the url instead
 SearchWebsite(website)
 {
 	Clipboard := ""
@@ -119,7 +120,9 @@ SearchWebsite(website)
 	return
 }
 
-; search tab by user input in current active program
+; search tab by user input in current active program, if no match, do actions dependent on programs
+; the search is based on window title (i.e. Chrome tab title)
+; the user input is triggered after 5 seconds or pressing Enter
 SearchTab()
 {
 	WinGet, program, ProcessName, A
@@ -151,7 +154,7 @@ SearchTab()
 }
 
 ; https://goo.gl/DtZL8P
-; check if mouse is hovering an existing window
+; check if mouse is hovering an existing window (no need to be active)
 MouseHover(window_class)
 {
 	MouseGetPos, , , A
@@ -165,8 +168,8 @@ MouseOver(window_class, y_boundary)
 	return WinActive(window_class . " ahk_id " . A) && (y < y_boundary)
 }
 
-; move active window to specified position and size
-MoveWindow(position := "middle", scale := 1.4)
+; move active window to specified position
+MoveWindow(position := "middle")
 {
 	WinRestore, A
 	x := 0
@@ -175,8 +178,8 @@ MoveWindow(position := "middle", scale := 1.4)
 	height := A_ScreenHeight
 	
 	if (position == "middle") {
-		width /= scale
-		height /= scale
+		width /= 1.4
+		height /= 1.4
 		x := A_ScreenWidth / 2 - width / 2
 		y := A_ScreenHeight / 2 - height / 2
 	}
@@ -213,8 +216,10 @@ CapsLock & Pause::
 	Suspend
 	Pause, , 1
 	return
+CapsLock & ScrollLock::ExitApp
 
 ; program shortcut
+; note that program names and paths are set to my PC's configuration
 CapsLock & a::ActivateProgram("ahk_exe AcroRd32.exe", "AcroRd32.exe")
 CapsLock & e::ActivateProgram("ahk_class CabinetWClass", "explorer.exe")
 CapsLock & c::ActivateProgram("ahk_exe Code.exe" ,"C:\Program Files\Microsoft VS Code\Code.exe")
@@ -223,6 +228,9 @@ CapsLock & t::ActivateProgram("ahk_exe mintty.exe", "C:\Program Files\Git\git-ba
 CapsLock & o::ActivateProgram("ahk_exe Battle.net.exe", "C:\Program Files (x86)\Battle.net\Battle.net.exe")
 CapsLock & l::ActivateProgram("ahk_class RCLIENT", "D:\Games\League of Legends\LeagueClient.exe")
 CapsLock & s::SearchTab()
+F2::SearchWebsite("google")
+F3::SearchWebsite("youtube")
+F4::GroupActivate, explorerGroup, R
 
 ; windows navigation
 CapsLock & Space::Send, !{Tab}
@@ -273,7 +281,6 @@ CapsLock & Mbutton::
 	return
 ; https://goo.gl/vRsUaN
 ; move mouse pixel by pixel for dragging/drawing graphics
-; toggle mouse click
 CapsLock & Numpad0::Send, % (toggle := !toggle) ? "{LButton Down}" : "{LButton Up}"
 #If toggle
 	LButton::return
@@ -294,11 +301,6 @@ CapsLock & Numpad0::Send, % (toggle := !toggle) ? "{LButton Down}" : "{LButton U
 	WheelDown::Send ^{PgDn}
 #If
 return
-
-; special function
-F2::SearchWebsite("google")
-F3::SearchWebsite("youtube")
-F4::GroupActivate, explorerGroup, R
 
 ; macros in programs
 #IfWinActive ahk_exe Code.exe
@@ -338,10 +340,10 @@ F4::GroupActivate, explorerGroup, R
 return
 
 ; NOT USE =========================================================================================
-; snippet - it is here for reference only
+; snippet - here for reference only
 ; issues:
 	; inconsistent input in certain applications
-	; no longer needed as editors have this feature built in
+	; no longer needed as editors have this feature built in (except Word lol)
 /*
 :*B0:(::){Left}
 :*B0:[::]{Left}
