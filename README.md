@@ -28,7 +28,7 @@ Note that files specified in the `#include` commands in `Daily.ahk` are not uplo
 
 - **file path**: some programs need to specify full path to run
 
-- **conflicting titles**:
+- **conflicting title**:
 
     - `Discord` and `Google Chrome` have the same `ahk_class`
 
@@ -39,6 +39,10 @@ Note that files specified in the `#include` commands in `Daily.ahk` are not uplo
     - `File Explorer` has no consistent title (i.e. `- window title`)
 
     - `Discord` home page is `Discord` instead of `... - Discord`
+
+- **web title**:
+
+    - tab that is currently playing audio (shows `This tab is playing audio` in tab title) cannot be detected
 
 ## Todo
 

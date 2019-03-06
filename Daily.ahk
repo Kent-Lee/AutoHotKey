@@ -67,8 +67,11 @@ return
 ; directory_path is the starting directory of the program
 ActivateProgram(program, program_path, directory_path := "")
 {
-	if (!WinExist(program))
+	if (!WinExist(program)) {
 		Run, % program_path, % directory_path
+		WinWaitActive, % program, , 2
+		MoveWindow()
+	}
 	else if (!WinActive(program))
 		WinActivate
 	else
@@ -105,30 +108,33 @@ UriDecode(str)
 }
 
 ; search specified website by selected text, if it contains "http", open the url instead
-SearchWebsite(website)
+SearchWebsite(website, keyword := "")
 {
-	Clipboard := ""
-	Send, ^c
-	ClipWait, 0
-	if (InStr(Clipboard, "http"))
-		action := % Clipboard
+	if (keyword == "") {
+		Clipboard := ""
+		Send, ^c
+		ClipWait, 0
+		keyword := Clipboard
+	}
+	if (InStr(keyword, "http"))
+		action := % keyword
 	else if (website == "youtube")
-		action := "https://www.youtube.com/results?search_query=" . UriEncode(Clipboard)
+		action := "https://www.youtube.com/results?search_query=" . UriEncode(keyword)
 	else if (website == "google")
-		action := "http://www.google.com/search?q=" . UriEncode(Clipboard)
+		action := "http://www.google.com/search?q=" . UriEncode(keyword)
 	Run, % action
 	return
 }
 
-; search tab by user input in current active program, if no match, do actions dependent on programs
-; the search is based on window title (i.e. Chrome tab title)
+; search tab by input/keyword in current active program, if no match, do actions dependent on programs
+; the search is based on window title (e.g. Chrome tab title)
 ; the user input is triggered after 5 seconds or pressing Enter
-SearchTab()
+SearchTab(keyword := "")
 {
 	WinGet, program, ProcessName, A
 	if (program == "chrome.exe" || program == "Code.exe") {
 		switch_tab := "^{PgDn}"
-		action := "http://www.google.com/search?q=" . UriEncode(user_input)
+		action := "http://www.google.com/search?q=" . UriEncode(keyword)
 	}
 	else if (program == "Explorer.EXE") {
 		switch_tab := "{F4}"
@@ -136,11 +142,12 @@ SearchTab()
 	}
 	else return
 
-	Input, user_input, B T5 E, {Enter}
+	if (keyword == "")
+		Input, keyword, B T5 E, {Enter}
 	WinGetTitle, current_tab, A
 	original_tab := current_tab
 	loop {
-		if (InStr(current_tab, user_input))
+		if (InStr(current_tab, keyword))
 			return
 		Send, % switch_tab
 		Sleep, 30
@@ -225,15 +232,15 @@ CapsLock & e::ActivateProgram("ahk_class CabinetWClass", "explorer.exe")
 CapsLock & c::ActivateProgram("ahk_exe Code.exe" ,"C:\Program Files\Microsoft VS Code\Code.exe")
 CapsLock & g::ActivateProgram("ahk_exe chrome.exe", "chrome.exe")
 CapsLock & t::ActivateProgram("ahk_exe mintty.exe", "C:\Program Files\Git\git-bash.exe", "C:\Users\kent")
-CapsLock & o::ActivateProgram("ahk_exe Battle.net.exe", "C:\Program Files (x86)\Battle.net\Battle.net.exe")
-CapsLock & l::ActivateProgram("ahk_class RCLIENT", "D:\Games\League of Legends\LeagueClient.exe")
+CapsLock & o::Run, C:\Program Files (x86)\Battle.net\Battle.net.exe
+CapsLock & l::Run, D:\Games\League of Legends\LeagueClient.exe
 CapsLock & s::SearchTab()
 F2::SearchWebsite("google")
 F3::SearchWebsite("youtube")
 F4::GroupActivate, explorerGroup, R
 
 ; windows navigation
-CapsLock & Space::Send, !{Tab}
+CapsLock & Space::AltTab
 CapsLock & Numpad1::MoveWindow("bottom left")
 CapsLock & Numpad2::MoveWindow("bottom")
 CapsLock & Numpad3::MoveWindow("bottom right")
@@ -294,11 +301,11 @@ CapsLock & Numpad0::Send, % (toggle := !toggle) ? "{LButton Down}" : "{LButton U
 	CapsLock & Numpad8::MouseMove, 0, -1, 0, R
 	CapsLock & Numpad9::MouseMove, 1, -1, 0, R
 #If MouseHover("ahk_class Shell_TrayWnd")
-	WheelUp::Send, {Volume_Up}
-	WheelDown::Send, {Volume_Down}
+	WheelUp::Send, +!{Tab}
+	WheelDown::Send, !{Tab}
 #If MouseOver("ahk_class Chrome_WidgetWin_1", 100)
-	WheelUp::Send ^{PgUp}
-	WheelDown::Send ^{PgDn}
+	WheelUp::Send, ^{PgUp}
+	WheelDown::Send, ^{PgDn}
 #If
 return
 
