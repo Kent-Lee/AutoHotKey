@@ -129,6 +129,9 @@ SearchWebsite(website, keyword := "")
 ; the user input is triggered after 5 seconds or pressing Enter
 SearchTab(keyword := "")
 {
+    if (!keyword)
+        Input, keyword, B T5 E, {Enter}
+
     WinGet, program, ProcessName, A
     if (program == "chrome.exe" || program == "Code.exe") {
         switch_tab := "^{PgDn}"
@@ -140,8 +143,6 @@ SearchTab(keyword := "")
     }
     else return
 
-    if (!keyword)
-        Input, keyword, B T5 E, {Enter}
     WinGetTitle, current_tab, A
     original_tab := current_tab
     loop {
@@ -236,7 +237,6 @@ CapsLock & s::SearchTab()
 F2::SearchWebsite("google")
 F3::SearchWebsite("youtube")
 F4::GroupActivate, explorerGroup, R
-CapsLock & q::SearchTab("youtube")
 
 ; windows navigation
 CapsLock & Space::AltTab

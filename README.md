@@ -18,11 +18,11 @@ Note that files specified in the `#include` commands in `Daily.ahk` are not uplo
 
 2. click `Create Task`, then go to
 
-    - `General` &rightarrow; enter task name &rightarrow; check `run with highest privileges`
+   - `General` &rightarrow; enter task name &rightarrow; check `run with highest privileges`
 
-    - `Triggers` &rightarrow; `New` &rightarrow; `at log on`
+   - `Triggers` &rightarrow; `New` &rightarrow; `at log on`
 
-    - `Actions` &rightarrow; `New` &rightarrow; `Browse` for script location
+   - `Actions` &rightarrow; `New` &rightarrow; `Browse` for script location
 
 ## Issues
 
@@ -30,23 +30,21 @@ Note that files specified in the `#include` commands in `Daily.ahk` are not uplo
 
 - **conflicting title**:
 
-    - `Discord` and `Google Chrome` have the same `ahk_class`
+  - `Discord` and `Google Chrome` have the same `ahk_class`
 
-    - `File Explorer` and `Taskbar` have the same `ahk_exe`
+  - `File Explorer` and `Taskbar` have the same `ahk_exe`
 
-    - `File Explorer` and `Control Center` have the same `ahk_class`
+  - `File Explorer` and `Control Center` have the same `ahk_class`
 
-    - `File Explorer` has no consistent title (i.e. `- window title`)
+  - `File Explorer` has no consistent title (i.e. `- window title`)
 
-    - `Discord` home page is `Discord` instead of `... - Discord`
+  - `Discord` home page is `Discord` instead of `... - Discord`
 
 - **web title**:
 
-    - tab that is currently playing audio (shows `This tab is playing audio` in tab title) cannot be detected
+  - tab that is currently playing audio (shows `This tab is playing audio` in tab title) cannot be detected
 
 ## Todo
-
-- <kbd>Capslock</kbd>+<kbd>Space</kbd>: cycle group (<kbd>Win</kbd>+<kbd>1~9</kbd>)
 
 - use <kbd>Shift</kbd> as secondary function
 
