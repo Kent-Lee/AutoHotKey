@@ -64,11 +64,11 @@ return
 ; FUNCTIONS =======================================================================================
 
 ; activate program, if not exist open it, if active minimize it
-; work_directory is the starting directory of the launched program
-ActivateProgram(program, target_path, work_directory := "")
+; work_dir is the starting directory of the launched program
+ActivateProgram(program, target_path, work_dir := "")
 {
     if (!WinExist(program)) {
-        Run, % target_path, % work_directory
+        Run, % target_path, % work_dir
         WinWaitActive, % program, , 2
         MoveWindow()
     }
