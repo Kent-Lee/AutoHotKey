@@ -58,21 +58,25 @@ GroupAdd, editors, ahk_exe Code.exe
 GroupAdd, editors, ahk_exe chrome.exe
 GroupAdd, editors, ahk_exe mintty.exe
 
+; functions run on startup
+ScheduleTask("Sunday", "C:\Users\Kent\OneDrive\Scripts\pixiv_scraper\main.py")
+ScheduleTask("Sunday", "C:\Users\Kent\OneDrive\Scripts\deviantart_scraper\main.py")
+ScheduleTask("Sunday", "C:\Users\Kent\OneDrive\Scripts\artstation_scraper\main.py")
+
+; end of auto execute section
 ; custom scripts
 #include %A_ScriptDir%
 #include auto_correct.ahk
-
-; end of auto execute section
 return
 
 ; FUNCTIONS =======================================================================================
 
 ; activate program, if not exist open it, if active minimize it
 ; work_dir is the starting directory of the launched program
-ActivateProgram(program, target_path, work_dir := "")
+ActivateProgram(program, program_path, work_dir := "")
 {
     if (!WinExist(program)) {
-        Run, % target_path, % work_dir
+        Run, % program_path, % work_dir
         WinWaitActive, % program, , 2
         MoveWindow()
     }
@@ -182,8 +186,7 @@ MouseOver(window_class, y_boundary)
 MoveWindow(position := "middle")
 {
     WinRestore, A
-    x := 0
-    y := 0
+    x := y := 0
     width := A_ScreenWidth
     height := A_ScreenHeight
 
@@ -216,6 +219,13 @@ FocusWindow(transparency)
     return
 }
 
+ScheduleTask(timestamp, task_path)
+{
+    SplitPath, task_path, file_name, dir_path
+    current_time := A_DDD . A_DDDD . A_MMM . A_MMMM
+    if (InStr(current_time, timestamp))
+        Run, % task_path, % dir_path
+}
 
 ; SCRIPT ==========================================================================================
 
@@ -254,7 +264,6 @@ CapsLock & Numpad7::MoveWindow("top left")
 CapsLock & Numpad8::MoveWindow("top")
 CapsLock & Numpad9::MoveWindow("top right")
 CapsLock & f::FocusWindow(0.75)
-Esc::Send, !{F4}
 
 ; editing macros
 +Left::Send, ^+{Left}
@@ -271,7 +280,7 @@ CapsLock & v::
 
 ; media control
 ; mute microphone, 9 is my device number, which can be found by running SoundCard.ahk
-Pause::SoundSet, +1, MASTER, MUTE, 9
+CapsLock & m::SoundSet, +1, MASTER, MUTE, 9
 CapsLock & Down::Send, {Media_Play_Pause}
 CapsLock & Left::Send, {Media_Prev}
 CapsLock & Right::Send, {Media_Next}
@@ -348,6 +357,8 @@ return
         Send, ^f
         Send, % Clipboard
         return
+#IfWinActive ahk_class CabinetWClass
+    Esc::Send, !{F4}
 #IfWinActive
 return
 
